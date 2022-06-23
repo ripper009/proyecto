@@ -12,8 +12,8 @@ from IPython.core.display import HTML
 
 #declaracion de variables y se establece la pagina donde se realizara el barrido
 
-url_inicial='https://books.toscrape.com/index.html'
-url_root='https://books.toscrape.com/index.html'
+url_inicial='https://firestorm-servers.com/es/welcome/login?back_url=https://firestorm-servers.com/es/shop/index'
+url_root='https://firestorm-servers.com/es/welcome/login?back_url=https://firestorm-servers.com/es/shop/index'
 
 r=requests.get(url_inicial)
 
@@ -22,17 +22,17 @@ r.status_code=200
 s= BeautifulSoup(r.text,'lxml')
 
 lista_article=s.find_all('article', class_='product_pod')
-links_libros=[x.find('h3').find('a').get('href') for x in lista_article]
-links_libros=[urljoin(url_root,i) for i in links_libros]
-links_libros
+links_tienda=[x.find('h3').find('a').get('href') for x in lista_article]
+links_tienda=[urljoin(url_root,i) for i in links_libros]
+links_tienda
 
 
 #funcion de obtener links
 def get_url_items(soup,url):
     lista_article=soup.find_all('article', class_='product_pod')
-    links_libros=[x.find('h3').find('a').get('href') for x in lista_article]
-    links_libros=[urljoin(url,i) for i in links_libros]
-    return links_libros
+    links_tienda=[x.find('h3').find('a').get('href') for x in lista_article]
+    links_tienda=[urljoin(url,i) for i in links_libros]
+    return links_tienda
 
 links_items=[]
 i=0
@@ -47,7 +47,7 @@ while i <50:
     if not next_a or not next_a[0].get('href'):
         break
     url_inicial = urljoin(url_inicial, next_a[0].get('href'))
-    #links_items.append(links)
+
 
     list_scraper=[]
     for i in links_items:
@@ -80,41 +80,41 @@ def scraper_book(url):
     content_book={}
     r=requests.get(url)
     s_item=BeautifulSoup(r.text,'lxml')
-    #se utiliza la variable de libro
+    #se utiliza la variable de arma
     titulo=s_item.find('h1').get_text(strip=True)
     if titulo:
-        content_book['Titulo']=titulo
+        content_arma['Titulo']=titulo
     else:
-        content_book['Titulo']=None
+        content_arma['Titulo']=None
     # se utiliza la variable de precio
     precio=s_item.find('p', class_='price_color').get_text(strip=True)
     if precio:
-        content_book['Precio']=precio
+        content_arma['Precio']=precio
     else:
-        content_book['Precio']=None
+        content_arma['Precio']=None
     #Se establece la descripcion del producto
     ancla_desc=s_item.find('div', id='product_description')
     if precio:
-        content_book['Descripcion']=ancla_desc.find_next_sibling('p').get_text(strip=True)
+        content_arma['Descripcion']=ancla_desc.find_next_sibling('p').get_text(strip=True)
     else:
-        content_book['Descripcion']=None
+        content_arma['Descripcion']=None
     #Se obtiene imagen
     src_img=s_item.find('div', class_='item active').find('img').get('src')
     if src_img:
-        content_book['Url_img']=urljoin(url_root,src_img)
+        content_arma['Url_img']=urljoin(url_root,src_img)
     else:
-        content_book['Url_img']=None
-    return content_book
+        content_arma['Url_img']=None
+    return content_arma
 
     #se muestra la lista
 list_scraper=list_scraper[0:10]
-datos_book=[]
+datos_tienda=[]
 for idx, i in enumerate(list_scraper):
         print('Se realiza el scraping de la pagina {idx}')
-        datos_book.append(scraper_book(i))
+        datos_tienda.append(scraper_tienda(i))
 
 #Se crea el catalogo
-df_catalogo=pd.DataFrame(datos_book)
+df_catalogo=pd.DataFrame(datos_tienda)
 df_catalogo
 
 #se usa imagen a traves de html
